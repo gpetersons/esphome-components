@@ -46,20 +46,33 @@ void BleAdvNumber::sub_init() {
 }
 
 void BleAdvController::set_encoding_and_variant(const std::string & encoding, const std::string & variant) {
-  auto ids = this->handler_->get_ids(encoding);
-  FixedVector<const char *> options;
-  options.init(ids.size());
-  for (auto &id : ids) {
-    options.push_back(id.c_str());
+  this->encoding_options_ = this->handler_->get_ids(encoding);
+  this->encoding_option_ptrs_.init(this->encoding_options_.size());
+  for (auto &id : this->encoding_options_) {
+    this->encoding_option_ptrs_.push_back(id.c_str());
   }
-  this->select_encoding_.traits.set_options(options);
+  this->select_encoding_.traits.set_options(this->encoding_option_ptrs_);
   this->cur_encoder_ = this->handler_->get_encoder(encoding, variant);
-  this->select_encoding_.publish_state(this->cur_encoder_->get_id());
+  if (this->cur_encoder_ == nullptr && !this->encoding_options_.empty()) {
+    this->cur_encoder_ = this->handler_->get_encoder(this->encoding_options_.front());
+  }
+  if (this->cur_encoder_ != nullptr) {
+    this->select_encoding_.publish_state(this->cur_encoder_->get_id());
+  }
   this->select_encoding_.add_on_state_callback([this](size_t index) { this->refresh_encoder(index); });
 }
 
 void BleAdvController::refresh_encoder(size_t index) {
-  this->cur_encoder_ = this->handler_->get_encoder(this->select_encoding_.option_at(index));
+  if (!this->select_encoding_.has_index(index)) {
+    ESP_LOGE(TAG, "Invalid encoder index: %zu", index);
+    return;
+  }
+  auto *encoder = this->handler_->get_encoder(this->select_encoding_.option_at(index));
+  if (encoder == nullptr) {
+    ESP_LOGE(TAG, "Failed to refresh encoder from selected option");
+    return;
+  }
+  this->cur_encoder_ = encoder;
 }
 
 void BleAdvController::set_min_tx_duration(int tx_duration, int min, int max, int step) {
@@ -122,6 +135,10 @@ void BleAdvController::on_raw_inject(std::string raw) {
 #endif
 
 bool BleAdvController::enqueue(Command &cmd) {
+  if (this->cur_encoder_ == nullptr) {
+    ESP_LOGW(TAG, "No active encoder configured, dropping command %d", cmd.main_cmd_);
+    return false;
+  }
   if (!this->cur_encoder_->is_supported(cmd)) {
     ESP_LOGW(TAG, "Unsupported command received: %d. Aborted.", cmd.main_cmd_);
     return false;

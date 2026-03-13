@@ -83,7 +83,7 @@ public:
   void set_encoding_and_variant(const std::string & encoding, const std::string & variant);
   void set_reversed(bool reversed) { this->reversed_ = reversed; }
   bool is_reversed() const { return this->reversed_; }
-  bool is_supported(const Command &cmd) { return this->cur_encoder_->is_supported(cmd); }
+  bool is_supported(const Command &cmd) { return this->cur_encoder_ != nullptr && this->cur_encoder_->is_supported(cmd); }
   void set_show_config(bool show_config) { this->show_config_ = show_config; }
   bool is_show_config() { return this->show_config_; }
 
@@ -111,6 +111,8 @@ protected:
 
   bool show_config_{false};
   BleAdvSelect select_encoding_;
+  std::vector<std::string> encoding_options_;
+  FixedVector<const char *> encoding_option_ptrs_;
   BleAdvEncoder * cur_encoder_{nullptr};
   BleAdvNumber number_duration_;
   BleAdvHandler * handler_{nullptr};
