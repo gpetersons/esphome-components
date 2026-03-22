@@ -276,7 +276,6 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     CORE.register_platform_component("select", var)
     CORE.register_platform_component("number", var)
-    cg.add(var.set_setup_priority(300)) # start after Bluetooth
     await cg.register_component(var, config)
     await setup_entity(var, config, "ble_adv_controller")
     cg.add(var.set_handler(hdl))
