@@ -265,15 +265,6 @@ bool BleAdvHandler::identify_param(const BleAdvParam & param, bool ignore_ble_pa
   return false;
 }
 
-#ifdef USE_API
-void BleAdvHandler::on_raw_decode(std::string raw) {
-  BleAdvParam param;
-  param.from_hex_string(raw);
-  ESP_LOGD(TAG, "raw - %s", esphome::format_hex_pretty(param.get_full_buf(), param.get_full_len()).c_str());
-  this->identify_param(param, true);
-}
-#endif
-
 #ifdef USE_ESP32_BLE_CLIENT
 /* Basic class inheriting esp32_ble_tracker::ESPBTDevice in order to access 
     protected attribute 'scan_result_' containing raw advertisement
