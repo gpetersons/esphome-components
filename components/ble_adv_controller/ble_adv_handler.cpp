@@ -151,9 +151,6 @@ bool BleAdvMultiEncoder::is_supported(const Command &cmd) {
 }
 
 void BleAdvHandler::setup() {
-#ifdef USE_API
-  register_service(&BleAdvHandler::on_raw_decode, "raw_decode", {"raw"});
-#endif
 #ifdef ESPHOME_ESP32_BLE_GAP_EVENT_HANDLER_COUNT
 #endif
 }
