@@ -259,7 +259,7 @@ class BleAdvRegistry:
             hdl_id = ID("ble_adv_static_handler", type=BleAdvHandler)
             cls.handler = cg.new_Pvariable(hdl_id)
             cg.add(cls.handler.set_component_source(cg.LogStringLiteral("ble_adv_handler")))
-            cg.add(cg.App.register_component(cls.handler))
+            await cg.register_component(cls.handler, {})
             ble = await cg.get_variable(ID("esp32_ble_esp32ble_id", type=esp32_ble.ESP32BLE))
             esp32_ble.register_gap_event_handler(ble, cls.handler)
             for encoding, params in BLE_ADV_ENCODERS.items():
