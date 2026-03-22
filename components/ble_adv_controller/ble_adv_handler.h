@@ -197,9 +197,6 @@ class BleAdvHandler: public Component
 #ifdef ESPHOME_ESP32_BLE_GAP_EVENT_HANDLER_COUNT
   , public esp32_ble::GAPEventHandler
 #endif
-#ifdef USE_API
-  , public api::CustomAPIDevice
-#endif
 {
 public:
   // component handling
@@ -226,11 +223,6 @@ public:
   // Listener
 #ifdef USE_ESP32_BLE_CLIENT
   void capture(const esp32_ble_tracker::ESPBTDevice & device, bool ignore_ble_param = true, uint16_t rem_time = 60);
-#endif
-
-#ifdef USE_API
-  // HA service to decode
-  void on_raw_decode(std::string raw);
 #endif
 
 protected:
