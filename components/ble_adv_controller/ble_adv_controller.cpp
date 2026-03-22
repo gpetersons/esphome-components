@@ -85,10 +85,6 @@ void BleAdvController::set_min_tx_duration(int tx_duration, int min, int max, in
 void BleAdvController::setup() {
 #ifdef USE_API
   auto name = std::string(this->get_name().c_str());
-  register_service(&BleAdvController::on_pair, "pair_" + name);
-  register_service(&BleAdvController::on_unpair, "unpair_" + name);
-  register_service(&BleAdvController::on_cmd, "cmd_" + name, {"cmd", "arg0", "arg1", "arg2", "arg3"});
-  register_service(&BleAdvController::on_raw_inject, "inject_raw_" + name, {"raw"});
 #endif
   if (this->is_show_config()) {
     this->select_encoding_.init("Encoding", this->get_name());
